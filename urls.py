@@ -1,5 +1,9 @@
 from django.urls import path
+<<<<<<< HEAD
 from .views import login_,logout_,register,home,record,role,welcome,admin_page,faculty_page,add_seminar_hall,get_hall_details_by_name,institute_info,book_hall
+=======
+from .views import login_,logout_,register,home,record,role,welcome,admin_page,faculty_page,add_seminar_hall,get_hall_details_by_name,institute_info
+>>>>>>> f38b26828fb3b384345a54bc6dc43ce383b89c60
 
 urlpatterns = [
     path('',welcome,name='welcome'),
@@ -14,6 +18,9 @@ urlpatterns = [
     path('add_hall/',add_seminar_hall,name='add_hall'),
     path('get_hall_details_by_name/<str:hall_name>/<str:institute_name>/', get_hall_details_by_name, name='get_hall_details_by_name'),
     path('institute_info/<str:institute_name>/', institute_info, name='institute_info'),
+<<<<<<< HEAD
     path('book_hall/<str:hall_name>/<str:institutename>/',book_hall,name='book_hall'), 
+=======
+>>>>>>> f38b26828fb3b384345a54bc6dc43ce383b89c60
     
 ]

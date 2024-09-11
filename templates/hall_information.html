@@ -176,11 +176,15 @@
         <!-- Seminar Hall Image Section -->
         <section class="image-section">
             <img src="{% static 'images/' %}{{ institute_name|lower|cut:" " }}.png" alt="Seminar Hall" class="hall-image" />
+<<<<<<< HEAD
             
             <a id="book-link" href="#" style="text-decoration: none;">
               <button class="book-button">Book</button>
           </a>
 
+=======
+            <button class="book-button">Book</button>
+>>>>>>> f38b26828fb3b384345a54bc6dc43ce383b89c60
         </section>
 
         <!-- Seminar Hall Information Section -->
@@ -230,7 +234,10 @@
     function fetchHallDetails() {
         const hallName = document.getElementById('hall-name').value;
         const institute_name = document.getElementById('hall-name').getAttribute('data-institute');
+<<<<<<< HEAD
         const institutename=institute_name;
+=======
+>>>>>>> f38b26828fb3b384345a54bc6dc43ce383b89c60
         console.log('Selected Hall Name:', hallName); // Check if the hall name is correct
 
         fetch(`/get_hall_details_by_name/${hallName}/${institute_name}/`)
@@ -249,9 +256,12 @@
                 document.getElementById('projector').checked = data.projector;
                 document.getElementById('audio').checked = data.audio;
                 document.getElementById('wifi').checked = data.wifi;
+<<<<<<< HEAD
 
                  const bookLink = document.getElementById('book-link');
                 bookLink.href = "{% url 'book_hall' 'hall_name_placeholder' 'institute_name_placeholder' %}".replace('hall_name_placeholder', hallName).replace('institute_name_placeholder', institutename);
+=======
+>>>>>>> f38b26828fb3b384345a54bc6dc43ce383b89c60
             })
             .catch(error => console.error('Error fetching hall details:', error));
     }

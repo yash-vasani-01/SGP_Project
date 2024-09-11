@@ -2,12 +2,18 @@ from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout, get_user_model
 from django.contrib import messages
 from django.contrib.auth.models import User
+<<<<<<< HEAD
 from .models import data,admin_data,SeminarHall,BookingRequest
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from django.core.exceptions import ValidationError
 from .validators import CustomPasswordValidator
 
+=======
+from .models import data,admin_data
+from django.contrib.auth.decorators import login_required
+from django.http import JsonResponse
+>>>>>>> f38b26828fb3b384345a54bc6dc43ce383b89c60
 
 def welcome(request):
     return render(request,'welcome.html')
@@ -44,6 +50,7 @@ def login_(request):
                 if 1 in user_status.status and 2 in user_status.status:
                     login(request, user)
                     return redirect('role')  # Redirect to role selection if both statuses are present
+<<<<<<< HEAD
                 elif 1 in user_status.status :
                     login(request, user)
                     messages.success(request, "Successful log in")
@@ -52,6 +59,12 @@ def login_(request):
                     login(request, user)
                     messages.success(request, "Successful log in")
                     return redirect('faculty_page')  # Redirect to home if user has appropriate status
+=======
+                else:
+                    login(request, user)
+                    messages.success(request, "Successful log in")
+                    return redirect('home')  # Redirect to home if user has appropriate status
+>>>>>>> f38b26828fb3b384345a54bc6dc43ce383b89c60
             else:
                 messages.error(request, "User status not found!")
                 return redirect('login')
@@ -61,6 +74,12 @@ def login_(request):
 
     return render(request, 'index.html')
 
+<<<<<<< HEAD
+=======
+from django.core.exceptions import ValidationError
+from .validators import CustomPasswordValidator
+
+>>>>>>> f38b26828fb3b384345a54bc6dc43ce383b89c60
 def register(request):
     if request.method == 'POST':
         username = request.POST['username']
@@ -98,6 +117,11 @@ def register(request):
 
     return render(request, 'register.html')
 
+<<<<<<< HEAD
+=======
+
+        
+>>>>>>> f38b26828fb3b384345a54bc6dc43ce383b89c60
 def logout_(request):
     logout(request)
     messages.success(request,'You are Logged Out success')
@@ -151,9 +175,15 @@ def role(request):
         if select_role=="Admin" and 1 in user_role_data.status:
             return redirect('admin_page')
         elif select_role=="Faculty" and 2 in user_role_data.status:
+<<<<<<< HEAD
             return redirect("faculty_page")    
     return render(request,'choose_role.html')
 
+=======
+            return redirect("faculty_page")
+        
+    return render(request,'choose_role.html')
+>>>>>>> f38b26828fb3b384345a54bc6dc43ce383b89c60
 @login_required
 def admin_page(request):
     user_data=data.objects.filter(email=request.user.email).first()
@@ -170,6 +200,14 @@ def faculty_page(request):
         return redirect('login')
     return render(request,'faculty_.html')
 
+<<<<<<< HEAD
+=======
+
+from django.contrib import messages
+from django.shortcuts import redirect, render
+from .models import SeminarHall
+
+>>>>>>> f38b26828fb3b384345a54bc6dc43ce383b89c60
 def add_seminar_hall(request):
     if request.method == 'POST':
         institute_name = request.POST.get('institute_name')
@@ -200,8 +238,20 @@ def add_seminar_hall(request):
             'message': "Seminar hall details added successfully!"
         })
     
+<<<<<<< HEAD
     return render(request, 'add_hall.html')
 
+=======
+    return render(request, 'add_hall.html',)
+
+def institute_info(request, institute_name):
+    halls = SeminarHall.objects.filter(institute_name=institute_name)
+    return render(request, 'hall_information.html', {
+        'institute_name': institute_name,
+        'halls': halls,
+    })
+    
+>>>>>>> f38b26828fb3b384345a54bc6dc43ce383b89c60
 def get_hall_details_by_name(request, hall_name, institute_name):
     halls = SeminarHall.objects.filter(hall_name=hall_name, institute_name=institute_name)
     if halls.exists():
@@ -215,6 +265,7 @@ def get_hall_details_by_name(request, hall_name, institute_name):
         }
         return JsonResponse(data)
     else:
+<<<<<<< HEAD
         return JsonResponse({'error': 'Hall not found'}, status=404)
     
 def institute_info(request, institute_name):
@@ -309,3 +360,6 @@ def book_hall(request, hall_name, institutename):
         hall = None  # If no hall is found, pass None
 
     return render(request, 'book_hall.html', {'hall': hall})
+=======
+        return JsonResponse({'error': 'Hall not found'}, status=404)
+>>>>>>> f38b26828fb3b384345a54bc6dc43ce383b89c60

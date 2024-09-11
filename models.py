@@ -1,6 +1,9 @@
 from django.db import models
 from django.contrib.auth.models import User
+<<<<<<< HEAD
 from datetime import time
+=======
+>>>>>>> f38b26828fb3b384345a54bc6dc43ce383b89c60
 
 class data(models.Model):
     username=models.CharField(max_length=50)
@@ -11,6 +14,7 @@ class data(models.Model):
 
 
 class admin_data(models.Model):
+<<<<<<< HEAD
     INSTITUTE_CHOICES = [
         ('CSPIT', 'CSPIT'),
         ('DEPSTAR', 'DEPSTAR'),
@@ -27,6 +31,12 @@ class admin_data(models.Model):
     email = models.EmailField(max_length=254)
     status=models.JSONField(blank=True, default=list)
     institute_name = models.CharField(max_length=255, choices=INSTITUTE_CHOICES, null=True, blank=True,unique=True) 
+=======
+    user = models.OneToOneField(User, on_delete=models.CASCADE,null=True)
+    username = models.CharField(max_length=150)
+    email = models.EmailField(max_length=254)
+    status=models.JSONField(blank=True, default=list)
+>>>>>>> f38b26828fb3b384345a54bc6dc43ce383b89c60
     
     
     def __str__(self):
@@ -41,7 +51,11 @@ class SeminarHall(models.Model):
     audio_system = models.BooleanField(default=False)
     projector = models.BooleanField(default=False)
     internet_wifi = models.BooleanField(default=False)
+<<<<<<< HEAD
     
+=======
+   
+>>>>>>> f38b26828fb3b384345a54bc6dc43ce383b89c60
     class Meta:
         constraints = [
             models.UniqueConstraint(fields=['institute_name', 'hall_name'], name='unique_hall_per_institute')
@@ -49,6 +63,7 @@ class SeminarHall(models.Model):
 
     def __str__(self):
         return f"{self.hall_name} ({self.institute_name})"
+<<<<<<< HEAD
 
 
 
@@ -70,3 +85,5 @@ class BookingRequest(models.Model):
 
     def __str__(self):
         return f"Request by {self.requester_name} for {self.hall_name} on {self.date} at {self.time_slot}"
+=======
+>>>>>>> f38b26828fb3b384345a54bc6dc43ce383b89c60
