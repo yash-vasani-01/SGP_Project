@@ -38,7 +38,22 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'bookingsystem',
+    'allauth',
+    'allauth.account',
+    'allauth.socialaccount',
+    'social_django',
+    'allauth.socialaccount.providers.google'
 ]
+
+SOCIALACCOUNT_PROVIDERS ={
+    "google":{
+        "SCOPE":[
+            "profile",
+            "email"
+        ],
+        "AUTH_PARAMS":{"access_type":"online"}
+    }
+}
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -48,6 +63,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'allauth.account.middleware.AccountMiddleware',
 ]
 
 ROOT_URLCONF = 'mysystem.urls'
@@ -70,21 +86,21 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'mysystem.wsgi.application'
 
+
+WSGI_APPLICATION = 'mysystem.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
 DATABASES = {
-    'default': {
+     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'Main_Data',
-        'USER': 'root',
-        'PASSWORD':'1125',
+        'NAME':'Booking_System' ,  # note that this name should be same as the name in mydb which is in create my db ..
+        'USER':'root',
+        'PASSWORD':'MySQL',
         'HOST':'localhost',
         'PORT':'3306',
-        
     }
 }
 
@@ -130,7 +146,12 @@ STATICFILES_FINDERS = [
     'django.contrib.staticfiles.finders.FileSystemFinder',
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
 ]
+
+AUTHENTICATION_BACKENDS=(
+    'django.contrib.auth.backends.ModelBackend',
+    'allauth.account.auth_backends.AuthenticationBackend',
+)
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
-
+LOGIN_REDIRECT_URL = '/welcome'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
