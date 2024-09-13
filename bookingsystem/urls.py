@@ -3,6 +3,7 @@ from .views import login_,logout_,register,home,record,role,welcome,admin_page,f
 from . import views
 from allauth.account.views import LoginView
 from allauth.socialaccount.views import SignupView
+from .views import CustomPasswordResetView, CustomPasswordResetConfirmView, password_reset_done
 
 urlpatterns = [
     path('',welcome,name='welcome'),
@@ -22,4 +23,7 @@ urlpatterns = [
     path('login/', LoginView.as_view(), name='login'),
     path('google/login/', SignupView.as_view(), name='google_login'),
     path('accounts/', include('allauth.urls')),
+    path('password-reset/', CustomPasswordResetView, name='password_reset'),
+    path('password-reset/done/', password_reset_done, name='password_reset_done'),
+    path('password-reset/confirm/<uidb64>/<token>/', CustomPasswordResetConfirmView, name='password_reset_confirm'),
 ]

@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect,HttpResponse
 from django.contrib.auth import authenticate, login, logout, get_user_model
 from django.contrib import messages
 from django.contrib.auth.models import User
-from .models import data,admin_data
+from .models import data
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from django.contrib.sessions.backends.db import SessionStore
@@ -40,6 +40,55 @@ def captcha_image(request):
         image = base64.b64decode(encoded_image)
         return HttpResponse(image, content_type='image/png')
     return HttpResponse('Captcha not found', status_code=404)
+
+
+from django.contrib.auth.tokens import default_token_generator
+
+from .forms import CustomPasswordResetForm
+from django.contrib.auth.forms import PasswordResetForm
+from django.contrib.auth.models import User
+from django.core.mail import send_mail
+from django.db.models import Q
+
+def CustomPasswordResetView(request):
+    if request.method == 'POST':
+        form = PasswordResetForm(request.POST)
+        if form.is_valid():
+            email = form.cleaned_data['email']
+            users = User.objects.filter(Q(email__iexact=email) | Q(username__iexact=email))
+            if users.exists():
+                # Send password reset email
+                for user in users:
+                    # Use Django's built-in password reset functionality
+                    user.email_user('Password reset', 'Someone asked for password reset for your account. Click the link below:')
+                    # You can customize the email content and subject here
+                return HttpResponse('Password reset email sent successfully!')
+            else:
+                return HttpResponse('No user found with that email address.')
+    else:
+        form = PasswordResetForm()
+    return render(request, 'password_reset.html', {'form': form})
+def password_reset_done(request):
+    return render(request, 'password_reset_done_email_sent.html')
+
+def CustomPasswordResetConfirmView(request, uidb64, token):
+    try:
+        uid = urlsafe_base64_decode(uidb64).decode()
+        user = User.objects.get(pk=uid)
+    except (TypeError, ValueError, OverflowError, User.DoesNotExist):
+        user = None
+
+    if user is not None and default_token_generator.check_token(user, token):
+        if request.method == 'POST':
+            form = SetPasswordForm(user, request.POST)
+            if form.is_valid():
+                form.save()
+                return redirect('login')
+        else:
+            form = SetPasswordForm(user)
+        return render(request, 'password_reset_confirm.html', {'form': form})
+    else:
+        return render(request, 'password_reset_confirm_invalid.html')
 
 @csrf_protect
 def login_(request):
