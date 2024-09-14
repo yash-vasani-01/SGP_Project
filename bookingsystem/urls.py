@@ -1,9 +1,9 @@
-from django.urls import path,include
+from django.urls import path,include #type:ignore
 from .views import login_,logout_,register,home,record,role,welcome,admin_page,faculty_page,add_seminar_hall,get_hall_details_by_name,institute_info
 from . import views
-from allauth.account.views import LoginView
-from allauth.socialaccount.views import SignupView
-from .views import CustomPasswordResetView, CustomPasswordResetConfirmView, password_reset_done
+from allauth.account.views import LoginView  #type:ignore
+from allauth.socialaccount.views import SignupView #type:ignore
+from .views import CustomPasswordResetConfirmView
 
 urlpatterns = [
     path('',welcome,name='welcome'),
@@ -23,7 +23,9 @@ urlpatterns = [
     path('login/', LoginView.as_view(), name='login'),
     path('google/login/', SignupView.as_view(), name='google_login'),
     path('accounts/', include('allauth.urls')),
-    path('password-reset/', CustomPasswordResetView, name='password_reset'),
-    path('password-reset/done/', password_reset_done, name='password_reset_done'),
-    path('password-reset/confirm/<uidb64>/<token>/', CustomPasswordResetConfirmView, name='password_reset_confirm'),
+    path('password_reset/', views.password_reset_request, name='password_reset'),
+    path('password_reset_confirm/<int:uid>/<str:token>/', views.password_reset_confirm, name='password_reset_confirm'),
+    path('password_reset_complete_close_tab/', views.password_reset_complete_close_tab, name='password_reset_complete_close_tab'),
+    path('reset/<uidb64>/<token>/', CustomPasswordResetConfirmView.as_view(), name='password_reset_confirm'),
 ]
+

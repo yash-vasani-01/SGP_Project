@@ -1,12 +1,12 @@
-from django.shortcuts import render, redirect,HttpResponse
-from django.contrib.auth import authenticate, login, logout, get_user_model
-from django.contrib import messages
-from django.contrib.auth.models import User
+from django.shortcuts import render, redirect,HttpResponse #type:ignore
+from django.contrib.auth import authenticate, login, logout, get_user_model #type:ignore
+from django.contrib import messages #type:ignore
+from django.contrib.auth.models import User #type:ignore
 from .models import data
-from django.contrib.auth.decorators import login_required
-from django.http import JsonResponse
-from django.contrib.sessions.backends.db import SessionStore
-from django.views.decorators.csrf import csrf_protect
+from django.contrib.auth.decorators import login_required #type:ignore
+from django.http import JsonResponse #type:ignore
+from django.contrib.sessions.backends.db import SessionStore #type:ignore
+from django.views.decorators.csrf import csrf_protect #type:ignore
 
 def welcome(request):
     return render(request,'welcome.html')
@@ -14,8 +14,8 @@ def home(request):
     alldata=data.objects.all()
     return render(request,'index1.html',{'alldata':alldata})
 
-from PIL import Image
-from captcha.image import ImageCaptcha
+from PIL import Image #type:ignore
+from captcha.image import ImageCaptcha #type:ignore
 from io import BytesIO
 import base64
 
@@ -41,54 +41,6 @@ def captcha_image(request):
         return HttpResponse(image, content_type='image/png')
     return HttpResponse('Captcha not found', status_code=404)
 
-
-from django.contrib.auth.tokens import default_token_generator
-
-from .forms import CustomPasswordResetForm
-from django.contrib.auth.forms import PasswordResetForm
-from django.contrib.auth.models import User
-from django.core.mail import send_mail
-from django.db.models import Q
-
-def CustomPasswordResetView(request):
-    if request.method == 'POST':
-        form = PasswordResetForm(request.POST)
-        if form.is_valid():
-            email = form.cleaned_data['email']
-            users = User.objects.filter(Q(email__iexact=email) | Q(username__iexact=email))
-            if users.exists():
-                # Send password reset email
-                for user in users:
-                    # Use Django's built-in password reset functionality
-                    user.email_user('Password reset', 'Someone asked for password reset for your account. Click the link below:')
-                    # You can customize the email content and subject here
-                return HttpResponse('Password reset email sent successfully!')
-            else:
-                return HttpResponse('No user found with that email address.')
-    else:
-        form = PasswordResetForm()
-    return render(request, 'password_reset.html', {'form': form})
-def password_reset_done(request):
-    return render(request, 'password_reset_done_email_sent.html')
-
-def CustomPasswordResetConfirmView(request, uidb64, token):
-    try:
-        uid = urlsafe_base64_decode(uidb64).decode()
-        user = User.objects.get(pk=uid)
-    except (TypeError, ValueError, OverflowError, User.DoesNotExist):
-        user = None
-
-    if user is not None and default_token_generator.check_token(user, token):
-        if request.method == 'POST':
-            form = SetPasswordForm(user, request.POST)
-            if form.is_valid():
-                form.save()
-                return redirect('login')
-        else:
-            form = SetPasswordForm(user)
-        return render(request, 'password_reset_confirm.html', {'form': form})
-    else:
-        return render(request, 'password_reset_confirm_invalid.html')
 
 @csrf_protect
 def login_(request):
@@ -141,8 +93,82 @@ def login_(request):
             return redirect('login')
     return render(request, 'index.html')
 
-from django.core.exceptions import ValidationError
-from .validators import CustomPasswordValidator
+from django.contrib.auth.tokens import default_token_generator #type:ignore
+from django.core.mail import send_mail #type:ignore
+from django.shortcuts import render, redirect #type:ignore
+from django.contrib.auth.models import User #type:ignore
+from django.urls import reverse #type:ignore
+from .forms import PasswordResetForm #type:ignore
+
+def password_reset_request(request):
+    if request.method == "POST":
+        form = PasswordResetForm(request.POST)
+        if form.is_valid():
+            email = form.cleaned_data['email']
+            users = User.objects.filter(email=email)
+            if users.exists():
+                user = users.first()
+                token = default_token_generator.make_token(user)
+                reset_url = request.build_absolute_uri(
+                    reverse('password_reset_confirm', kwargs={'uid': user.id, 'token': token})
+                )
+                send_mail(
+                    subject="Password Reset Request",
+                    message=f"Click the link to reset your password: {reset_url}",
+                    from_email="chaudharivirjibhai84.com",
+                    recipient_list=[email],
+                    fail_silently=False,
+                )
+                messages.success(request, "A password reset link has been sent to your email.")
+                return redirect('login')
+    else:
+        form = PasswordResetForm()
+    
+    return render(request, 'password_reset_form.html', {'form': form})
+
+from django.contrib.auth.views import PasswordResetConfirmView #type:ignore
+from django.contrib import messages #type:ignore
+from django.urls import reverse_lazy #type:ignore
+
+class CustomPasswordResetConfirmView(PasswordResetConfirmView):
+    success_url = reverse_lazy('login')
+
+    def form_valid(self, form):
+        messages.success(self.request, 'Your password has been successfully changed. You can now log in.')
+        return super().form_valid(form)
+
+
+from django.contrib.auth.tokens import default_token_generator #type:ignore
+from django.contrib.auth import get_user_model #type:ignore
+from django.shortcuts import render, redirect #type:ignore
+from django.utils.http import urlsafe_base64_decode #type:ignore
+from django.contrib.auth.hashers import make_password #type:ignore
+
+User = get_user_model()
+
+def password_reset_confirm(request, uid, token):
+    user = User.objects.get(pk=uid)
+    if default_token_generator.check_token(user, token):
+        if request.method == "POST":
+            new_password = request.POST.get('new_password')
+            confirm_password = request.POST.get('confirm_password')
+            if new_password == confirm_password:
+                user.password = make_password(new_password)
+                user.save()
+                return redirect('password_reset_complete_close_tab')
+        return render(request, 'password_reset_confirm.html', {'validlink': True})
+    else:
+        return render(request, 'password_reset_confirm.html', {'validlink': False})
+
+
+
+
+def password_reset_complete_close_tab(request):
+    # This template sets a flag in localStorage to show the popup
+    return render(request, 'password_reset_complete_close_tab.html')
+
+
+
 
 def register(request):
     if request.method == 'POST':
@@ -256,8 +282,8 @@ def faculty_page(request):
     return render(request,'faculty_.html')
 
 
-from django.contrib import messages
-from django.shortcuts import redirect, render
+from django.contrib import messages #type:ignore
+from django.shortcuts import redirect, render #type:ignore
 from .models import SeminarHall
 
 def add_seminar_hall(request):

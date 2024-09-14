@@ -312,6 +312,7 @@
             }
         }
     </script>
+
 </head>
 <body>
     <div class="login-container">
@@ -319,18 +320,17 @@
             <img loading="lazy" src="{% static 'images/logo1.png' %}" class="side-image" alt="Side image" />
             <main class="login-form-container">
                 <div class="login-form-wrapper">
-                   
                     {% if messages %}
-                <div id="message-popup" class="popup">
-                    <div class="popup-content">
-                        {% for message in messages %}
-                            <p class="alert {{ message.tags }}">{{ message }}</p>
-                        {% endfor %}
-                        <button class="close-popup" onclick="closePopup()">Close</button>
-                    </div>
-                </div>
+                        <div id="message-popup" class="popup">
+                            <div class="popup-content">
+                                {% for message in messages %}
+                                    <p class="alert {{ message.tags }}">{{ message }}</p>
+                                {% endfor %}
+                                <button class="close-popup" onclick="closePopup()">Close</button>
+                            </div>
+                        </div>
                     {% endif %}
-
+    
                     <h1 class="login-title">Login</h1>
                     <hr class="divider" />
                     <form class="form-fields" method="POST" action="{% url 'login' %}" enctype="multipart/form-data">
@@ -363,7 +363,7 @@
                         </div>                        
                         <a href="{% url 'password_reset' %}" class="forgot-password">Forget password?</a>
                     </form>
-
+    
                     <hr class="divider" />
                     <div class="register-wrapper">
                         <a href="{% url 'register' %}" class="register-button">Register</a>
@@ -371,6 +371,6 @@
                 </div>
             </main>
         </div>
-    </div>
-</body>
-{% endblock %}
+    </div>    
+    </body>
+        {% endblock %}
