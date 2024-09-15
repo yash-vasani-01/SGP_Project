@@ -41,7 +41,6 @@ def captcha_image(request):
         return HttpResponse(image, content_type='image/png')
     return HttpResponse('Captcha not found', status_code=404)
 
-
 @csrf_protect
 def login_(request):
     # Check if the user is already authenticated
@@ -71,7 +70,7 @@ def login_(request):
         
         if captcha_text and user_captcha.lower() == captcha_text.lower():
             user = authenticate(request, username=username, password=password)
-            if user is not None and user.is_active:  # Check if user is active
+            if user is not None:  # Check if user is active
                 user_status = data.objects.filter(email=user.email).first()
                 if user_status:
                     # Check if user has the required status
@@ -89,7 +88,7 @@ def login_(request):
                 messages.error(request, "Log in failed! Check your credentials and try again.")
                 return redirect('login')
         else:
-            messages.error(request, 'Invalid captcha')
+            messages.error(request, 'Log in failded! Check your credentials and try again.')
             return redirect('login')
     return render(request, 'index.html')
 
@@ -167,7 +166,17 @@ def password_reset_complete_close_tab(request):
     # This template sets a flag in localStorage to show the popup
     return render(request, 'password_reset_complete_close_tab.html')
 
-
+from django.contrib.auth.models import User # type:ignore
+from django.core.mail import send_mail # type:ignore
+from django.utils.http import urlsafe_base64_encode # type:ignore
+from django.utils.encoding import force_bytes # type:ignore
+from django.template.loader import render_to_string # type:ignore
+from django.contrib.sites.shortcuts import get_current_site # type:ignore
+from django.utils import timezone # type:ignore
+from .tokens import account_activation_token
+from datetime import timedelta
+from .validators import CustomPasswordValidator
+from django.core.exceptions import ValidationError # type:ignore
 
 
 def register(request):
@@ -176,37 +185,80 @@ def register(request):
         email = request.POST.get('email')
         password = request.POST.get('password')
         confirm_password = request.POST['confirm_password']
-
-        # Validate password using CustomPasswordValidator
         password_validator = CustomPasswordValidator()
         
+        # Validate the password using your custom validator
         try:
-            # Validate password rules
             password_validator.validate(password)
         except ValidationError as e:
             messages.error(request, e.messages[0])
             return redirect('register')
 
+        # Check if passwords match
         if password != confirm_password:
             messages.error(request, "Passwords do not match.")
             return redirect('register')
 
+        # Check if the username already exists
         if User.objects.filter(username=username).exists():
             messages.error(request, "Username already exists.")
             return redirect('register')
 
+        # Check if the email is already registered
         if User.objects.filter(email=email).exists():
             messages.error(request, "Email is already registered.")
             return redirect('register')
 
-        # If all validations pass, create the user
+        # Create user, but set is_active=False to deactivate until email confirmation
         newuser = User.objects.create_user(username, email, password)
+        newuser.is_active = False  # Deactivate user
         newuser.save()
-        messages.success(request, "Your account has been created successfully")
+
+        # Send activation email
+        current_site = get_current_site(request)
+        mail_subject = 'Activate your account.'
+        message = render_to_string('activate_email.html', {
+            'user': newuser,
+            'domain': current_site.domain,
+            'uid': urlsafe_base64_encode(force_bytes(newuser.pk)),
+            'token': account_activation_token.make_token(newuser),
+        })
+        to_email = email
+        send_mail(mail_subject, message, 'chaudharivirjibhai84@gmail.com', [to_email])
+
+        # Inform the user to check their email for activation
+        messages.success(request, "Your account has been created successfully. Please check your email to activate your account.")
         return redirect('login')
 
     return render(request, 'register.html')
+from django.utils.http import urlsafe_base64_decode # type:ignore
+from django.utils.encoding import force_str # type:ignore
+from django.contrib.auth.models import User # type:ignore
+from .tokens import account_activation_token # type:ignore
+from django.utils import timezone # type:ignore
+from datetime import timedelta
 
+def activate(request, uidb64, token):
+    try:
+        uid = force_str(urlsafe_base64_decode(uidb64))
+        user = User.objects.get(pk=uid)
+    except(TypeError, ValueError, OverflowError, User.DoesNotExist):
+        user = None
+
+    # Check if the token is valid and user is within the 10-minute window
+    token_validity_period = timedelta(minutes=10)
+    token_expiration = user.date_joined + token_validity_period
+
+    if user is not None and account_activation_token.check_token(user, token):
+        if timezone.now() <= token_expiration:
+            user.is_active = True
+            user.save()
+            return redirect('login')
+        else:
+            user.delete()  # Remove the user if the token has expired
+            return render(request, 'activation_link_expired.html')
+    else:
+        return render(request, 'activation_invalid.html')
 
         
 def logout_(request):

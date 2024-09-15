@@ -45,6 +45,8 @@ INSTALLED_APPS = [
     'allauth.socialaccount.providers.google'
 ]
 
+
+
 SOCIALACCOUNT_PROVIDERS ={
     "google":{
         "SCOPE":[
@@ -91,6 +93,7 @@ EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 EMAIL_HOST_USER = 'chaudharivirjibhai84@gmail.com' 
 EMAIL_HOST_PASSWORD = 'tfkx jlxb buhz ninb' 
+DEFAULT_FROM_EMAIL = 'chaudharivirjibhai84@gmail.com'
 
 WSGI_APPLICATION = 'mysystem.wsgi.application'
 
@@ -126,6 +129,7 @@ AUTH_PASSWORD_VALIDATORS = [
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
 ]
+
 
 
 # Internationalization

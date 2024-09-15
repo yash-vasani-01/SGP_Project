@@ -1,5 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
+#pip install six for activation link
+
 
 class data(models.Model):
     username=models.CharField(max_length=50)

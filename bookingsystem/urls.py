@@ -27,5 +27,7 @@ urlpatterns = [
     path('password_reset_confirm/<int:uid>/<str:token>/', views.password_reset_confirm, name='password_reset_confirm'),
     path('password_reset_complete_close_tab/', views.password_reset_complete_close_tab, name='password_reset_complete_close_tab'),
     path('reset/<uidb64>/<token>/', CustomPasswordResetConfirmView.as_view(), name='password_reset_confirm'),
+    path('register/', views.register, name='register'),
+    path('activate/<uidb64>/<token>/', views.activate, name='activate'),
 ]
 
