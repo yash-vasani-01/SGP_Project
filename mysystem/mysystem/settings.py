@@ -79,7 +79,7 @@ WSGI_APPLICATION = 'mysystem.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'admindata',
+        'NAME': 'Main_Data',
         'USER': 'root',
         'PASSWORD':'1125',
         'HOST':'localhost',
@@ -134,3 +134,12 @@ STATICFILES_FINDERS = [
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'  
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'yashvasani784@gmail.com'
+EMAIL_HOST_PASSWORD = 'vfkmjfbxlqvgyiqz'
+DEFAULT_FROM_EMAIL = 'yashvasani784@gmail.com'

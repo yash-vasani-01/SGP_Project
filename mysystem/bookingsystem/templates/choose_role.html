@@ -1,5 +1,5 @@
+{% extends "base.html" %}
 {% load static %}
-
 {% block content %}
 <style>
     body, html {
@@ -18,21 +18,6 @@
         justify-content: flex-start;
         padding: 20px;
         box-sizing: border-box;
-    }
-    .header {
-        width: 100%;
-        max-width: 1200px;
-        display: flex;
-        justify-content: flex-end;
-        align-items: center;
-        margin-bottom: 0px;
-        background-color: white;
-        padding: 1%;
-        height: 7%;
-    }
-    .logo {
-        width: 50%;
-        height: auto;
     }
     .register-content {
         display: flex;
@@ -60,7 +45,6 @@
         box-sizing: border-box;
         overflow-y: auto;
         margin-top: 10%;
-    
     }
     .register-form {
         display: flex;
@@ -72,7 +56,6 @@
         text-align: center;
         font: bold 42px 'Khula', sans-serif;
         margin-top: -10px;
-        
     }
     .role-button {
         border-radius: 10px;
@@ -114,13 +97,9 @@
             padding: 12px;
         }
     }
-    </style>
-   
-        <header class="header">
-            <div class="logo">
-                <img src="{% static 'images/logo.jpg' %}" alt="Company Logo" class="logo">
-            </div>
-        </header>
+</style>
+
+<body> 
     <div class="register-container">
         <div class="register-content">
             <img loading="lazy" src="{% static 'images/logo1.png' %}" class="register-image" alt="Registration illustration" />
@@ -129,9 +108,8 @@
                     {% csrf_token %}
                     <h1 class="register-title">Choose Your Role</h1>
                     <hr style="width:100%;text-align:left;margin-left:0;margin-top:-10px;margin-bottom:20px">
-                    <a  href="#" id="admin-role" class="role-button" role="button" name='role'>Admin</a>
-                    <a  href="#" id="faculty-role" class="role-button" name='role'  role="button">Faculty</a>
-                    
+                    <a href="{% url "admin_request" %}" id="admin-role" class="role-button" role="button" name='role'>Admin</a>
+                    <a href="{% url "faculty_page" %}" id="faculty-role" class="role-button" name='role' role="button">Faculty</a>
                 </form>
             </div>
         </div>
